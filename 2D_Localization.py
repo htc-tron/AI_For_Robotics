@@ -44,20 +44,21 @@
 #  [-1,0] - up
 
 def sense(p, measurement, sensor_tol, colours):
-    q = [[0 for row in range(len(p[0]))] for col in range(len(p))]
+    aux = [[0 for row in range(len(p[0]))] for col in range(len(p))]
+
     s = 0.0
-    for i in range(len(colours)):
-        for j in range(len(colours[i])):
+
+    for i in range(len(p)):
+        for j in range(len(p[i])):
             hit = (measurement == colours[i][j])
         #    print p[i][j]
         #    print((p[i][j] * (hit * sensor_tol + (1.0-hit) * (1.0-sensor_tol))))
-            q[i][j] = (p[i][j] * (hit * sensor_tol + (1.0-hit) * (1.0-sensor_tol)))
-            s+=q[i][j]
-            
-    for i in range(len(q)):
-        for j in range(len(p[i])):
-            q[i][j] = q[i][j] / s
-    return q
+            aux[i][j] = p[i][j] * (hit * sensor_tol + (1-hit) * (1.0-sensor_tol))
+            s += aux[i][j]
+    for i in range(len(aux)):
+        for j in range(len(aux[i])):
+            aux[i][j] /= s
+    return aux
 
 def move(p, U, prob):
     q= [[0 for row in range(len(p[0]))] for col in range(len(p))]
@@ -75,9 +76,8 @@ def localize(colors,measurements,motions,sensor_right,p_move):
     
     # >>> Insert your code here <<<
     for x in range(len(motions)):
-        p = sense(p,measurements[x],sensor_right,colors)
         p = move(p,motions[x],p_move)
-        
+        p = sense(p,measurements[x],sensor_right,colors)
     return p
 
 def show(p):
